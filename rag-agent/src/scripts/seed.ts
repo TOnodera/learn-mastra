@@ -1,0 +1,63 @@
+
+import { MDocument } from "@mastra/rag";
+import fs from "fs";
+import { mastra } from "../mastra";
+import { embedMany } from "ai";
+import { ModelRouterEmbeddingModel } from "@mastra/core/llm";
+
+
+const documents = [
+    {
+        filePath: "src/documents/company_faq.md",
+        sourceName: "company_faq",
+    },
+    {
+        filePath: "src/documents/operations_manual.md",
+        sourceName: "operations_manual",
+    },
+    {
+        filePath: "src/documents/onboarding_guide.md",
+        sourceName: "onboarding_guide",
+    }
+];
+
+// インデックス作成
+const vectorStore = mastra.getVector("libSqlVector");
+await vectorStore.createIndex({
+    indexName: "company_docs",
+    dimension: 3072,
+});
+
+for (const { filePath, sourceName } of documents) {
+    const text = fs.readFileSync(filePath, "utf-8");
+    const doc = MDocument.fromText(text);
+
+    // チャンク化
+    const chunks = await doc.chunk({
+        strategy: "markdown",
+        headers: [
+            ["#", "title"],
+            ["##", "section"],
+        ]
+    });
+
+    // ベクトル化
+    const values = chunks.map(chunk => chunk.text);
+    const { embeddings } = await embedMany({
+        model: new ModelRouterEmbeddingModel("google/gemini-embedding-001"),
+        values
+    });
+
+    // ベクトルDBへ保存
+    await vectorStore.upsert({
+        indexName: "company_docs",
+        vectors: embeddings,
+        metadata: chunks.map(chunk => ({
+            text: chunk.text,
+            source: sourceName,
+            sections: chunk.metadata?.section || "",
+            title: chunk.metadata?.title || "",
+            createdAt: new Date().toISOString()
+        }))
+    })
+}
