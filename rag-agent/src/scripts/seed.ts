@@ -55,7 +55,7 @@ for (const { filePath, sourceName } of documents) {
         metadata: chunks.map(chunk => ({
             text: chunk.text,
             source: sourceName,
-            sections: chunk.metadata?.section || "",
+            section: chunk.metadata?.section || "",
             title: chunk.metadata?.title || "",
             createdAt: new Date().toISOString()
         }))
