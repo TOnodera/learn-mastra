@@ -61,7 +61,7 @@ export const researchAgent = new Agent({
 
   利用可能なすべてのツールを体系的に使用し、フォローアップフェーズの後に停止してください。
   `,
-  model: "openai/gpt-5-nano",
+  model: "openai/gpt-4o-mini",
   tools: {
     searchTool,
     evaluateResultTool,

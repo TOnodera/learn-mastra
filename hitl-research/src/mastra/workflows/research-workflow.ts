@@ -1,3 +1,4 @@
+import { runResumeDurableStreamUntilIdle } from "@mastra/core/agent/durable";
 import { createStep, createWorkflow } from "@mastra/core/workflows";
 import { queryObjects } from "node:v8";
 import { z } from "zod";
@@ -125,34 +126,54 @@ const researchStep = createStep({
   }
 });
 
+/**
+ * 承認ステップ
+ */
+const approvalStep = createStep({
+  id: "approval",
+  inputSchema: z.object({
+    researchData: z.any(),
+    summary: z.string()
+  }),
+  outputSchema: z.object({
+    approved: z.boolean(),
+    researchData: z.any()
+  }),
+  resumeSchema: z.object({
+    approved: z.boolean()
+  }),
+  execute: async ({ inputData, resumeData, suspend }) => {
+    if (resumeData) {
+      return {
+        ...resumeData,
+        researchData: inputData.researchData
+      };
+    }
+    await suspend({
+      summary: inputData.summary,
+      message: `このリサーチで十分ですか？[y/n]`
+    });
+    return {
+      approved: false,
+      researchData: inputData.researchData
+    };
+  }
+});
+
 export const researchWorkflow = createWorkflow({
   id: "research-workflow",
   inputSchema: z.object({
     query: z.string().describe("検索したい内容を教えてください！")
   }),
   outputSchema: z.object({
-    researchData: z.object({
-      queries: z.array(z.string()),
-      searchResults: z.array(
-        z.object({
-          title: z.string(),
-          url: z.string(),
-          relevance: z.string()
-        })
-      ),
-      learnings: z.array(
-        z.object({
-          learning: z.string(),
-          followUpQuestions: z.array(z.string()),
-          source: z.string()
-        })
-      ),
-      completedQueries: z.array(z.string()),
-      phase: z.enum(["initial", "follow-up"])
-    }),
-    summary: z.string()
+    approved: z.boolean(),
+    researchData: z.any()
   }),
-  steps: [getUserQueryStep, researchStep]
+  steps: [getUserQueryStep, researchStep, approvalStep]
 });
 
-researchWorkflow.then(getUserQueryStep).then(researchStep).commit();
+researchWorkflow
+  .then(getUserQueryStep)
+  .then(researchStep)
+  .then(approvalStep)
+  .commit();

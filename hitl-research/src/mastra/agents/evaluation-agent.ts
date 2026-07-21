@@ -24,5 +24,5 @@ export const evaluationAgent = new Agent({
     "reason": "決定の簡潔な説明"
   }
   `,
-  model: "openai/gpt-5-nano"
+  model: "openai/gpt-4o-mini"
 });

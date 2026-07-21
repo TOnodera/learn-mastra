@@ -11,5 +11,5 @@ export const queryEvaluationAgent = new Agent({
     - 検索可能なトピックか
     追加のコンテキスト情報がある場合は、それも考慮して判断してください。
     `,
-  model: "openai/gpt-4o-nano"
+  model: "openai/gpt-4o-mini"
 });
