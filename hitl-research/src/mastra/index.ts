@@ -9,10 +9,18 @@ import {
   Observability,
   SensitiveDataFilter
 } from "@mastra/observability";
+import { researchAgent } from "./agents/research-agent";
+import { evaluationAgent } from "./agents/evaluation-agent";
+import { learningExtractionAgent } from "./agents/learning-extraction-agent";
 
 export const mastra = new Mastra({
   workflows: { researchWorkflow },
-  agents: { queryEvaluationAgent },
+  agents: {
+    queryEvaluationAgent,
+    researchAgent,
+    evaluationAgent,
+    learningExtractionAgent
+  },
   storage: new LibSQLStore({
     id: "mastra-storage",
     url: "file:../mastra.db"

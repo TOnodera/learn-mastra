@@ -55,15 +55,104 @@ const getUserQueryStep = createStep({
   }
 });
 
+/**
+ * 検索エージェントの出力型
+ */
+export const researchDataSchema = z.object({
+  queries: z.array(z.string()),
+  searchResult: z.array(
+    z.object({
+      title: z.string(),
+      url: z.string(),
+      content: z.string()
+    })
+  ),
+  learnings: z.array(
+    z.object({
+      learning: z.string(),
+      followUpQuestions: z.array(z.string()),
+      source: z.string()
+    })
+  ),
+  completedQueries: z.array(z.string()),
+  phase: z.enum(["initial", "follow-up"])
+});
+
+/**
+ * リサーチ実行
+ */
+const researchStep = createStep({
+  id: "research",
+  inputSchema: z.object({
+    query: z.string()
+  }),
+  outputSchema: z.object({
+    researchData: researchDataSchema,
+    summary: z.string()
+  }),
+  execute: async ({ inputData, mastra }) => {
+    const { query } = inputData;
+    try {
+      const agent = mastra.getAgent("researchAgent");
+      const result = await agent.generate(
+        `こちらのトピックをリサーチしてください： ${query}`,
+        {
+          maxSteps: 15,
+          structuredOutput: {
+            schema: researchDataSchema,
+            jsonPromptInjection: true
+          }
+        }
+      );
+      const researchData = result.object;
+      const summary = `Research completed on "${query}:" \n\n${JSON.stringify(researchData, null, 2)}\n\n`;
+      return {
+        researchData,
+        summary
+      };
+    } catch (e: any) {
+      return {
+        researchData: {
+          queries: [],
+          searchResult: [],
+          learnings: [],
+          completedQueries: [],
+          phase: "initial" as const
+        },
+        summary: `Error: ${e.message}`
+      };
+    }
+  }
+});
+
 export const researchWorkflow = createWorkflow({
   id: "research-workflow",
   inputSchema: z.object({
     query: z.string().describe("検索したい内容を教えてください！")
   }),
   outputSchema: z.object({
-    query: z.string().describe("検索可能なクエリ")
+    researchData: z.object({
+      queries: z.array(z.string()),
+      searchResults: z.array(
+        z.object({
+          title: z.string(),
+          url: z.string(),
+          relevance: z.string()
+        })
+      ),
+      learnings: z.array(
+        z.object({
+          learning: z.string(),
+          followUpQuestions: z.array(z.string()),
+          source: z.string()
+        })
+      ),
+      completedQueries: z.array(z.string()),
+      phase: z.enum(["initial", "follow-up"])
+    }),
+    summary: z.string()
   }),
-  steps: [getUserQueryStep]
+  steps: [getUserQueryStep, researchStep]
 });
 
-researchWorkflow.then(getUserQueryStep).commit();
+researchWorkflow.then(getUserQueryStep).then(researchStep).commit();
