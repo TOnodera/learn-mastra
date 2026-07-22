@@ -61,7 +61,7 @@ const getUserQueryStep = createStep({
  */
 export const researchDataSchema = z.object({
   queries: z.array(z.string()),
-  searchResult: z.array(
+  searchResults: z.array(
     z.object({
       title: z.string(),
       url: z.string(),
@@ -115,7 +115,7 @@ const researchStep = createStep({
       return {
         researchData: {
           queries: [],
-          searchResult: [],
+          searchResults: [],
           learnings: [],
           completedQueries: [],
           phase: "initial" as const
@@ -132,12 +132,12 @@ const researchStep = createStep({
 const approvalStep = createStep({
   id: "approval",
   inputSchema: z.object({
-    researchData: z.any(),
+    researchData: researchDataSchema,
     summary: z.string()
   }),
   outputSchema: z.object({
     approved: z.boolean(),
-    researchData: z.any()
+    researchData: researchDataSchema
   }),
   resumeSchema: z.object({
     approved: z.boolean()
@@ -167,7 +167,7 @@ export const researchWorkflow = createWorkflow({
   }),
   outputSchema: z.object({
     approved: z.boolean(),
-    researchData: z.any()
+    researchData: researchDataSchema
   }),
   steps: [getUserQueryStep, researchStep, approvalStep]
 });

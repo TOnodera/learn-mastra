@@ -1,7 +1,7 @@
 import { Agent } from "@mastra/core/agent";
-import { searchTool } from "@mastra/core/workspace";
 import { evaluateResultTool } from "../tools/evaluate-result-tool";
 import { extractLearningsTool } from "../tools/extract-learnings-tool";
+import { searchTool } from "../tools/search-tool";
 
 export const researchAgent = new Agent({
   id: "research-agent",
@@ -36,7 +36,7 @@ export const researchAgent = new Agent({
     - existingUrls で重複URLを除外する
   - extractLearningsTool:
     - 入力は query と result（title / url / content）
-    - 出力の learning を learnings に追加し、followUpQuestions をフェーズ2用に収集する
+    - 出力の learning と followUpQuestions、元の検索結果のURLをsourceとしてlearningsに追加する
     - フォローアップ質問は短く具体的な質問として扱う
 
   **出力構造:**
@@ -50,7 +50,13 @@ export const researchAgent = new Agent({
         "content": "結果の内容"
       }
     ],
-    "learnings": ["学び1", "学び2", ...],
+    "learnings": [
+      {
+        "learning": "検索結果から得られた学び",
+        "followUpQuestions": ["より深い調査のための質問"],
+        "source": "学びを抽出した検索結果のURL"
+      }
+    ],
     "completedQueries": ["完了したクエリ1", "完了したクエリ2", ...],
     "phase": "initial" または "follow-up"
   }
