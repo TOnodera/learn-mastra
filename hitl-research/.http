@@ -1,0 +1,16 @@
+### エージェント一覧
+GET http://localhost:4111/api/agents
+
+### クエリ評価エージェントの呼び出し
+POST http://localhost:4111/api/agents/queryEvaluationAgent/generate
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
+
+{
+    "messages": [
+        {
+            "role": "user",
+            "content": "ハリネズミの寿命は？"
+        }
+    ]
+}

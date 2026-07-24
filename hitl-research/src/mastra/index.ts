@@ -14,6 +14,7 @@ import { evaluationAgent } from "./agents/evaluation-agent";
 import { learningExtractionAgent } from "./agents/learning-extraction-agent";
 import { generateReportWorkflow } from "./workflows/generate-report-workflow";
 import { reportAgent } from "./agents/report-agent";
+import { MastraJwtAuth } from "@mastra/auth";
 
 export const mastra = new Mastra({
   workflows: { researchWorkflow, generateReportWorkflow },
@@ -40,5 +41,10 @@ export const mastra = new Mastra({
         spanOutputProcessors: [new SensitiveDataFilter()]
       }
     }
-  })
+  }),
+  server: {
+    auth: new MastraJwtAuth({
+      secret: process.env.MASTRA_JWT_SECRET
+    })
+  }
 });
