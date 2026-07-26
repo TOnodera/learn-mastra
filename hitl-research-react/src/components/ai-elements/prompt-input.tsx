@@ -7,37 +7,37 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
+  CommandSeparator
 } from "@/components/ui/command";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {
   HoverCard,
   HoverCardContent,
-  HoverCardTrigger,
+  HoverCardTrigger
 } from "@/components/ui/hover-card";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
-  InputGroupTextarea,
+  InputGroupTextarea
 } from "@/components/ui/input-group";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import {
   Tooltip,
   TooltipContent,
-  TooltipTrigger,
+  TooltipTrigger
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { ChatStatus, FileUIPart, SourceDocumentUIPart } from "ai";
@@ -47,7 +47,7 @@ import {
   Monitor,
   PlusIcon,
   SquareIcon,
-  XIcon,
+  XIcon
 } from "lucide-react";
 import { nanoid } from "nanoid";
 import type {
@@ -61,7 +61,7 @@ import type {
   KeyboardEventHandler,
   PropsWithChildren,
   ReactNode,
-  RefObject,
+  RefObject
 } from "react";
 import {
   Children,
@@ -71,7 +71,7 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useState,
+  useState
 } from "react";
 
 // ============================================================================
@@ -113,7 +113,7 @@ const captureScreenshot = async (): Promise<File | null> => {
   try {
     stream = await navigator.mediaDevices.getDisplayMedia({
       audio: false,
-      video: true,
+      video: true
     });
 
     video.srcObject = stream;
@@ -161,7 +161,7 @@ const captureScreenshot = async (): Promise<File | null> => {
 
     return new File([blob], `screenshot-${timestamp}.png`, {
       lastModified: Date.now(),
-      type: "image/png",
+      type: "image/png"
     });
   } finally {
     if (stream) {
@@ -247,7 +247,7 @@ export type PromptInputProviderProps = PropsWithChildren<{
  */
 export const PromptInputProvider = ({
   initialInput: initialTextInput = "",
-  children,
+  children
 }: PromptInputProviderProps) => {
   // ----- textInput state
   const [textInput, setTextInput] = useState(initialTextInput);
@@ -274,8 +274,8 @@ export const PromptInputProvider = ({
         id: nanoid(),
         mediaType: file.type,
         type: "file" as const,
-        url: URL.createObjectURL(file),
-      })),
+        url: URL.createObjectURL(file)
+      }))
     ]);
   }, []);
 
@@ -330,7 +330,7 @@ export const PromptInputProvider = ({
       fileInputRef,
       files: attachmentFiles,
       openFileDialog,
-      remove,
+      remove
     }),
     [attachmentFiles, add, remove, clear, openFileDialog]
   );
@@ -350,8 +350,8 @@ export const PromptInputProvider = ({
       textInput: {
         clear: clearInput,
         setInput: setTextInput,
-        value: textInput,
-      },
+        value: textInput
+      }
     }),
     [textInput, clearInput, attachments, __registerFileInput]
   );
@@ -582,7 +582,7 @@ export const PromptInput = ({
       if (incoming.length && accepted.length === 0) {
         onError?.({
           code: "accept",
-          message: "No files match the accepted types.",
+          message: "No files match the accepted types."
         });
         return;
       }
@@ -592,7 +592,7 @@ export const PromptInput = ({
       if (accepted.length > 0 && sized.length === 0) {
         onError?.({
           code: "max_file_size",
-          message: "All files exceed the maximum size.",
+          message: "All files exceed the maximum size."
         });
         return;
       }
@@ -607,7 +607,7 @@ export const PromptInput = ({
         if (typeof capacity === "number" && sized.length > capacity) {
           onError?.({
             code: "max_files",
-            message: "Too many files. Some were not added.",
+            message: "Too many files. Some were not added."
           });
         }
         const next: (FileUIPart & { id: string })[] = [];
@@ -617,7 +617,7 @@ export const PromptInput = ({
             id: nanoid(),
             mediaType: file.type,
             type: "file",
-            url: URL.createObjectURL(file),
+            url: URL.createObjectURL(file)
           });
         }
         return [...prev, ...next];
@@ -646,7 +646,7 @@ export const PromptInput = ({
       if (incoming.length && accepted.length === 0) {
         onError?.({
           code: "accept",
-          message: "No files match the accepted types.",
+          message: "No files match the accepted types."
         });
         return;
       }
@@ -656,7 +656,7 @@ export const PromptInput = ({
       if (accepted.length > 0 && sized.length === 0) {
         onError?.({
           code: "max_file_size",
-          message: "All files exceed the maximum size.",
+          message: "All files exceed the maximum size."
         });
         return;
       }
@@ -671,7 +671,7 @@ export const PromptInput = ({
       if (typeof capacity === "number" && sized.length > capacity) {
         onError?.({
           code: "max_files",
-          message: "Too many files. Some were not added.",
+          message: "Too many files. Some were not added."
         });
       }
 
@@ -818,7 +818,7 @@ export const PromptInput = ({
       fileInputRef: inputRef,
       files: files.map((item) => ({ ...item, id: item.id })),
       openFileDialog,
-      remove,
+      remove
     }),
     [files, add, remove, clearAttachments, openFileDialog]
   );
@@ -829,14 +829,14 @@ export const PromptInput = ({
         const array = Array.isArray(incoming) ? incoming : [incoming];
         setReferencedSources((prev) => [
           ...prev,
-          ...array.map((s) => ({ ...s, id: nanoid() })),
+          ...array.map((s) => ({ ...s, id: nanoid() }))
         ]);
       },
       clear: clearReferencedSources,
       remove: (id: string) => {
         setReferencedSources((prev) => prev.filter((s) => s.id !== id));
       },
-      sources: referencedSources,
+      sources: referencedSources
     }),
     [referencedSources, clearReferencedSources]
   );
@@ -868,7 +868,7 @@ export const PromptInput = ({
               // If conversion failed, keep the original blob URL
               return {
                 ...item,
-                url: dataUrl ?? item.url,
+                url: dataUrl ?? item.url
               };
             }
             return item;
@@ -1047,10 +1047,10 @@ export const PromptInputTextarea = ({
           controller.textInput.setInput(e.currentTarget.value);
           onChange?.(e);
         },
-        value: controller.textInput.value,
+        value: controller.textInput.value
       }
     : {
-        onChange,
+        onChange
       };
 
   return (
@@ -1178,7 +1178,11 @@ export const PromptInputActionMenuTrigger = ({
   children,
   ...props
 }: PromptInputActionMenuTriggerProps) => (
-  <DropdownMenuTrigger render={<PromptInputButton className={className} {...props} />}>{children ?? <PlusIcon className="size-4" />}</DropdownMenuTrigger>
+  <DropdownMenuTrigger
+    render={<PromptInputButton className={className} {...props} />}
+  >
+    {children ?? <PlusIcon className="size-4" />}
+  </DropdownMenuTrigger>
 );
 
 export type PromptInputActionMenuContentProps = ComponentProps<

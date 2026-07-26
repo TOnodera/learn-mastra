@@ -15,6 +15,7 @@ import { learningExtractionAgent } from "./agents/learning-extraction-agent";
 import { generateReportWorkflow } from "./workflows/generate-report-workflow";
 import { reportAgent } from "./agents/report-agent";
 import { MastraJwtAuth } from "@mastra/auth";
+import { workflowRoute } from "@mastra/ai-sdk";
 
 export const mastra = new Mastra({
   workflows: { researchWorkflow, generateReportWorkflow },
@@ -45,6 +46,11 @@ export const mastra = new Mastra({
   server: {
     auth: new MastraJwtAuth({
       secret: process.env.MASTRA_JWT_SECRET
-    })
+    }),
+    apiRoutes: [
+      workflowRoute({
+        path: "/workflow/:workflowId"
+      })
+    ]
   }
 });
