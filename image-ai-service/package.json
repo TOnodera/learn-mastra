@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/react": "^4.0.44",
+    "@libsql/kysely-libsql": "^0.4.1",
     "@mastra/ai-sdk": "^1.7.0",
     "@mastra/core": "^1.54.0",
     "@mastra/duckdb": "^1.5.2",
@@ -18,8 +19,10 @@
     "@mastra/memory": "^1.24.0",
     "@mastra/observability": "^1.16.3",
     "ai": "^7.0.41",
+    "better-auth": "^1.6.25",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "kysely": "^0.29.4",
     "lucide-react": "^1.28.0",
     "mastra": "^1.20.3",
     "next": "16.2.12",
