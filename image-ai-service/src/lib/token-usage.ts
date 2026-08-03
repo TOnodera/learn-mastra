@@ -4,7 +4,7 @@ import { getCurrentYearMonth } from "./plans";
 export async function getMonthlyTokenUsage(userId: string): Promise<number> {
   const yearMonth = getCurrentYearMonth();
   const result = await db.execute({
-    sql: `SELECT token_used FROM token_usage WHERE user_id = ? AND year_month = ?`,
+    sql: `SELECT tokens_used FROM token_usage WHERE user_id = ? AND year_month = ?`,
     args: [userId, yearMonth]
   });
 
@@ -23,7 +23,7 @@ export async function incrementTokenUsage(
   await db.execute({
     sql: `
         INSERT INTO token_usage
-        (id, user_id, tokens_used, updated_at)
+        (id, user_id, year_month, tokens_used, updated_at)
         VALUES
         (lower(hex(randomblob(16))), ?, ?, ?, datetime('now'))
         ON CONFLICT (user_id, year_month)

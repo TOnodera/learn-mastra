@@ -4,8 +4,8 @@ export const PLANS = {
 } as const;
 
 export const PLAN_MODELS = {
-  free: "google/gemini-3.5-flash",
-  pro: "google/gemini-3.1-pro-preview"
+  free: "openai/gpt-5-nano",
+  pro: "openai/gpt-5.6-luna"
 } as const;
 
 export type Plan = keyof typeof PLANS;

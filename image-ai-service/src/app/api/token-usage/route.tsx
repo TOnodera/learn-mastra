@@ -1,7 +1,6 @@
 import { auth } from "@/lib/auth";
 import { getCurrentYearMonth, getMonthlyTokenLimit, PLANS } from "@/lib/plans";
 import { getMonthlyTokenUsage } from "@/lib/token-usage";
-import { error } from "console";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
