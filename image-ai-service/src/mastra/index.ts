@@ -17,7 +17,7 @@ export const mastra = new Mastra({
   }),
   logger: new PinoLogger({
     name: "Mastra",
-    level: "info"
+    level: "debug"
   }),
   observability: new Observability({
     configs: {

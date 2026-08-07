@@ -5,11 +5,33 @@ import {
   TokenLimiterProcessor,
   UnicodeNormalizer
 } from "@mastra/core/processors";
+import { LocalFilesystem, Workspace } from "@mastra/core/workspace";
+
+const workspace = new Workspace({
+  filesystem: new LocalFilesystem({ basePath: "./workspace" }),
+  skills: ["skills"],
+  bm25: true
+});
 
 export const imageSupportAgent = new Agent({
   id: "image-support-agent",
   name: "image-support-agent",
-  instructions: `あなたは画像生成AIサービスのサポートエージェントです。ユーザーの質問に丁寧に答えてください。`,
+  instructions: `
+あなたは画像生成 AI サービスのサポートエージェントです。
+
+## 機能
+- ユーザーの質問や操作に関するサポート
+- imageGenerationTool を使ってユーザーの要望に応じた画像を生成する
+
+## ガイドライン
+- 回答は簡潔かつ丁寧に行うこと
+- ユーザーが画像の生成・作成・描画を要求した場合は、
+  imageGenerationTool を使用すること
+- スキルファイルに画像スタイル別の詳細なプロンプト指針があるので
+  積極的に参照すること
+- ユーザーのリクエストが曖昧な場合は確認の質問をすること
+- ユーザーが使用している言語と同じ言語で応答すること
+`,
   model: ({ requestContext }) => {
     const plan = (requestContext?.get("plan") as Plan | undefined) ?? "free";
     return PLAN_MODELS[plan];
