@@ -8,6 +8,11 @@ export const PLAN_MODELS = {
   pro: "openai/gpt-5.6-luna"
 } as const;
 
+export const PLAN_IMAGE_MODELS = {
+  free: "openai/gpt-image-2",
+  pro: "openai/gpt-image-2"
+};
+
 export type Plan = keyof typeof PLANS;
 
 export function getMonthlyTokenLimit(plan: Plan): number {
