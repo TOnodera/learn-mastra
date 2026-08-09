@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { updateUserPlan } from "@/app/actions";
+import { ChatPanel } from "@/components/chat-panel";
 
 type TokenUsage = {
   plan: string;
@@ -23,9 +24,7 @@ async function fetchTokenUsage(): Promise<TokenUsage> {
 }
 
 export default function ChatPage() {
-  const [input, setInput] = useState("");
   const [tokenUsage, setTokenUsage] = useState<TokenUsage | null>(null);
-  // isPending: Server Action 実行中は true になる
   const [isPending, startTransition] = useTransition();
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({ api: "/api/chat" })
@@ -43,10 +42,8 @@ export default function ChatPage() {
     });
   };
 
-  const handleSubmit = () => {
-    if (!input.trim()) return;
-    sendMessage({ text: input });
-    setInput("");
+  const handleMessageSent = () => {
+    fetchTokenUsage().then(setTokenUsage);
   };
 
   return (
@@ -68,42 +65,7 @@ export default function ChatPage() {
           </Badge>
         </div>
       )}
-      <Card className="flex-1 overflow-y-auto p-4 mb-4">
-        <ul className="space-y-3">
-          {messages.map((m) => (
-            <li
-              key={m.id}
-              className={cn("flex", m.role === "user" && "justify-end")}
-            >
-              <div
-                className={cn(
-                  "rounded-2xl px-4 py-2 max-w-[80%]",
-                  m.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted"
-                )}
-              >
-                {m.parts?.map((part, i) =>
-                  part.type === "text" ? <span key={i}>{part.text}</span> : null
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-      </Card>
-      <div className="flex gap-2">
-        <Input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          disabled={status !== "ready"}
-          onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-          placeholder="メッセージを入力..."
-          className="flex-1"
-        />
-        <Button onClick={handleSubmit} disabled={status !== "ready"}>
-          送信
-        </Button>
-      </div>
+      <ChatPanel onMessageSent={handleMessageSent} />
     </div>
   );
 }
