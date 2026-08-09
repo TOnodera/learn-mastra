@@ -6,6 +6,7 @@ import {
   UnicodeNormalizer
 } from "@mastra/core/processors";
 import { LocalFilesystem, Workspace } from "@mastra/core/workspace";
+import { imageGenerationTool } from "../tools/image-gereration-tool";
 
 const workspace = new Workspace({
   filesystem: new LocalFilesystem({ basePath: "./workspace" }),
@@ -29,6 +30,16 @@ export const imageSupportAgent = new Agent({
   imageGenerationTool を使用すること
 - スキルファイルに画像スタイル別の詳細なプロンプト指針があるので
   積極的に参照すること
+- 画像生成時のツール実行順は、必ず次のとおりにすること
+  1. skill で image-best-practices を1回だけ読み込む
+  2. 適切なテンプレートがある場合は、skill の結果に記載されたパスを
+     skill_read で読み込む
+  3. テンプレートを反映したプロンプトで imageGenerationTool を呼び出す
+  4. ツール結果を確認し、画像URLまたはエラーをユーザーへ回答する
+- 同じ実行中に image-best-practices を skill で複数回読み込まないこと。
+  skill の結果に References が含まれていても、skill を再実行せず
+  skill_read を使用すること
+- ツールを呼び出した後は、必ずユーザー向けの最終回答を返すこと
 - ユーザーのリクエストが曖昧な場合は確認の質問をすること
 - ユーザーが使用している言語と同じ言語で応答すること
 `,
@@ -49,7 +60,7 @@ export const imageSupportAgent = new Agent({
       trim: true
     }),
     // 利用できるトークンの上限を設定
-    new TokenLimiterProcessor({ limit: 800 }), // 800は日本語1840文字相当
+    new TokenLimiterProcessor({ limit: 8000 }), // ツール結果を含む実行コンテキストの上限
     // インジェクションを検出
     new PromptInjectionDetector({
       model: "openai/gpt-5-nano",
@@ -70,5 +81,16 @@ export const imageSupportAgent = new Agent({
         jsonPromptInjection: true
       }
     })
-  ]
+  ],
+  defaultOptions: {
+    maxSteps: 8,
+    providerOptions: {
+      openai: {
+        // 同じskillを並列で2回呼ぶのを防止
+        parallelToolCalls: false
+      }
+    }
+  },
+  tools: { imageGenerationTool },
+  workspace
 });

@@ -46,6 +46,7 @@ export async function POST(req: Request) {
     version: "v6",
     params: {
       ...params,
+      maxSteps: 8,
       requestContext,
       onFinish: async (event) => {
         const tokens = event.totalUsage?.totalTokens ?? 0;

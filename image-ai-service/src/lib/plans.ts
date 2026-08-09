@@ -9,9 +9,9 @@ export const PLAN_MODELS = {
 } as const;
 
 export const PLAN_IMAGE_MODELS = {
-  free: "openai/gpt-image-2",
-  pro: "openai/gpt-image-2"
-};
+  free: "gpt-image-1-mini",
+  pro: "gpt-image-2"
+} as const;
 
 export type Plan = keyof typeof PLANS;
 
