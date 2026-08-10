@@ -7,6 +7,7 @@ import {
 } from "@mastra/core/processors";
 import { LocalFilesystem, Workspace } from "@mastra/core/workspace";
 import { imageGenerationTool } from "../tools/image-gereration-tool";
+import { memory } from "../create-memory";
 
 const workspace = new Workspace({
   filesystem: new LocalFilesystem({ basePath: "./workspace" }),
@@ -92,5 +93,6 @@ export const imageSupportAgent = new Agent({
     }
   },
   tools: { imageGenerationTool },
-  workspace
+  workspace,
+  memory
 });

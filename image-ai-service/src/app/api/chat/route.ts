@@ -37,6 +37,16 @@ export async function POST(req: Request) {
 
   const params = await req.json();
 
+  let threadId = params.threadId as string | undefined;
+  // threadIdが未指定なら新規スレッドを作成
+  if (!threadId) {
+    const memory = await mastra.getAgentById("image-support-agent").getMemory();
+    if (memory) {
+      const thread = await memory.createThread({ resourceId });
+      threadId = thread.id;
+    }
+  }
+
   const requestContext = new RequestContext<{ plan: Plan }>();
   requestContext.set("plan", plan);
 
@@ -57,5 +67,10 @@ export async function POST(req: Request) {
     }
   });
 
-  return createUIMessageStreamResponse({ stream });
+  return createUIMessageStreamResponse({
+    stream,
+    headers: {
+      "x-thread-id": threadId ?? ""
+    }
+  });
 }
