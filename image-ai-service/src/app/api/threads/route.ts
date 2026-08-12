@@ -1,6 +1,5 @@
 import { auth } from "@/lib/auth";
 import { mastra } from "@/mastra";
-import { error } from "console";
 import { NextResponse } from "next/server";
 
 /**
@@ -19,12 +18,6 @@ export async function GET(req: Request) {
   }
 
   const resourceId = session.user.id;
-  const { searchParams } = new URL(req.url);
-  const threadId = searchParams.get("threadId");
-  if (!threadId) {
-    return NextResponse.json([]);
-  }
-
   const memory = await mastra.getAgentById("image-support-agent").getMemory();
   if (!memory) {
     return NextResponse.json([]);
