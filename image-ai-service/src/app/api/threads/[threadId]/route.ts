@@ -20,7 +20,6 @@ export async function DELETE(req: Request, { params }: RouteContext) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const resourceId = session.user.id;
   const { searchParams } = new URL(req.url);
   const threadId = searchParams.get("threadId");
   if (!threadId) {
