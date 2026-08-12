@@ -1,4 +1,4 @@
-import { handleChatStream, toAISdkV5Stream } from "@mastra/ai-sdk";
+import { handleChatStream } from "@mastra/ai-sdk";
 import { toAISdkV5Messages } from "@mastra/ai-sdk/ui";
 import { createUIMessageStreamResponse } from "ai";
 import { mastra } from "@/mastra";
@@ -57,6 +57,10 @@ export async function POST(req: Request) {
     version: "v6",
     params: {
       ...params,
+      memory: {
+        thread: threadId,
+        resource: resourceId
+      },
       maxSteps: 8,
       requestContext,
       onFinish: async (event) => {

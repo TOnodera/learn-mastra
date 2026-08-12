@@ -95,6 +95,7 @@ export function ChatPanel({
   const [input, setInput] = useState("");
 
   const threadIdRef = useRef(threadId);
+  const locallyCreatedThreadIdRef = useRef<string | null>(null);
   const onThreadCreatedRef = useRef(onThreadCreated);
 
   const prevStatusRef = useRef<string | null>(null);
@@ -119,6 +120,7 @@ export function ChatPanel({
         const newThreadId = response.headers.get("x-thread-id");
         if (newThreadId && !threadIdRef.current) {
           threadIdRef.current = newThreadId;
+          locallyCreatedThreadIdRef.current = newThreadId;
         }
         return response;
       }
@@ -132,6 +134,12 @@ export function ChatPanel({
     threadCreatedNotifiedRef.current = false;
     if (!threadId) {
       setMessages([]);
+      return;
+    }
+    // 新規チャットのストリーミング結果はすでに表示済みなので、
+    // URL へのスレッド ID 反映時に履歴で上書きしない。
+    if (locallyCreatedThreadIdRef.current === threadId) {
+      locallyCreatedThreadIdRef.current = null;
       return;
     }
     fetch(`/api/chat?threadId=${encodeURIComponent(threadId)}`)
@@ -167,19 +175,32 @@ export function ChatPanel({
       if (!titleCheckedRef.current) {
         titleCheckedRef.current = true;
         let attempt = 0;
-        const maxAttempts = 5;
+        const maxAttempts = 30;
         const interval = 1000;
+        const isPlaceholderTitle = (title: unknown) =>
+          typeof title !== "string" ||
+          !title.trim() ||
+          title === "New Chat" ||
+          /^New Thread \d{4}-\d{2}-\d{2}T/.test(title);
         const poll = async () => {
-          const res = await fetch(`/api/threads/${currentThreadId}`);
-          if (!res.ok) return;
-          const thread = await res.json();
-          if (thread.title && thread.title !== "New Chat") {
-            onTitleUpdate?.(currentThreadId, thread.title);
-            return;
-          }
           attempt++;
+          try {
+            const res = await fetch(`/api/threads/${currentThreadId}`);
+            if (res.ok) {
+              const thread = await res.json();
+              if (!isPlaceholderTitle(thread.title)) {
+                onTitleUpdate?.(currentThreadId, thread.title);
+                return;
+              }
+            }
+          } catch {
+            // 一時的な取得失敗は次のpollで再試行する。
+          }
           if (attempt < maxAttempts) {
             setTimeout(poll, interval);
+          } else {
+            // 次のメッセージ完了時に再びタイトルを確認できるようにする。
+            titleCheckedRef.current = false;
           }
         };
         poll();

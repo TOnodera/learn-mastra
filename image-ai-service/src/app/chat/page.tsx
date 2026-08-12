@@ -103,7 +103,6 @@ function ChatPageInner() {
   };
 
   const handleThreadCreated = (id: string) => {
-    setPendingMessage(null);
     router.replace(`/chat?threadId=${id}`);
     fetchThreads();
   };
@@ -161,7 +160,6 @@ function ChatPageInner() {
       <main className="flex flex-col flex-1 p-4 overflow-hidden">
         {threadId || pendingMessage ? (
           <ChatPanel
-            key={threadId ?? "new"}
             threadId={threadId}
             initialMessage={pendingMessage}
             onMessageSent={handleMessageSent}
