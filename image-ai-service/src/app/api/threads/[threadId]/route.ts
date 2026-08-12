@@ -20,11 +20,7 @@ export async function DELETE(req: Request, { params }: RouteContext) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { searchParams } = new URL(req.url);
-  const threadId = searchParams.get("threadId");
-  if (!threadId) {
-    return NextResponse.json([]);
-  }
+  const { threadId } = await params;
 
   const memory = await mastra.getAgentById("image-support-agent").getMemory();
   if (!memory) {
